@@ -105,18 +105,6 @@ func main() {
 		klog.Exitf("Error creating pod: %s", err)
 	}
 
-	// Set up job deletion
-	defer func() {
-		// start new context for cleanup since old one should already be done
-		ctx := context.Background()
-		klog.Infof("Cleaning up pod...")
-		bg := metav1.DeletePropagationBackground
-		err = kubeClient.BatchV1().Jobs(job.Namespace).Delete(ctx, job.Name, metav1.DeleteOptions{PropagationPolicy: &bg})
-		if err != nil {
-			klog.Exitf("Error cleaning up pod: %s", err)
-		}
-	}()
-
 	klog.Infof("Transcoder launched as job/%s (namespace: %s)", job.Name, job.Namespace)
 
 	ctx, stop := signal.NotifyContext(ctx, shutdownSignals...)
